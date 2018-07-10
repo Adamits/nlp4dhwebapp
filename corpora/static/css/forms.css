@@ -1,0 +1,14 @@
+.form-control::-webkit-input-placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #E8E8E8;
+    opacity: .8;
+}
+
+.form-control::-moz-placeholder {
+  color: #E8E8E8;
+  opacity: .8;
+}
+
+.form-control:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: #E8E8E8;
+    opacity: .8;
+}

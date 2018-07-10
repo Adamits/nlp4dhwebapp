@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load partials %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Concordnace{% endblock %}</title>
+  </head>
+  <body>
+    {% block pagecontent %}
+    <div class="container concordance">
+      <h3>Concordance</h3>
+      <div class="concordance-filters">
+    	<form action="concordance" method="post">
+    	  {% csrf_token %}
+        <div class="row form-group">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="concordance-query">Query</label>
+              {{form.query}}
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <label >Max Examples</label>
+            {{form.max_examples}}
+          </div>
+          <div class="col-sm-4">
+            <label >Semantic Roles</label>
+            <ul id="id_srl">
+              {% for c, t in form.srl.field.choices %}
+              <li>
+                <label>
+                  <input type="checkbox" name="srl" value={{c}} id="id_srl_0" {% if c in form.srl.value %}checked{% endif %}>
+                  {{t}}
+                </label>
+                <span class="color-box {{t}}"></span>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Query</button>
+    	</form>
+      </div>
+      {% if sentences is not None %}
+        <div class="concordance-results">
+          {{ num_sentences }} results
+          {% for sentence in sentences %}
+            <div class="concordance-result">
+              {{ sentence.highlighted_content | safe}}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    {% endblock %}
+  </body>
+</html>

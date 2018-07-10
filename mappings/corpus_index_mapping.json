@@ -1,0 +1,25 @@
+{
+    "mappings": {
+        "corpus": {
+            "properties": {
+                "name": {
+                    "type": "keyword"
+                },
+                "created_at": {
+                    "type": "date"
+                },
+                "sentences": {
+                    "type": "nested",
+                    "properties": {
+                        "content": {
+                            "type": "text"
+                        },
+                        "textSpans": {
+                            "type": "nested"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

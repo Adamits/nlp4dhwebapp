@@ -1,0 +1,79 @@
+<div class="container corpora">
+  <h3>My Corpora</h3>
+  <div class="corpora-pagination">
+    <span class="step-links">
+      {% if corpora.has_previous %}
+      <a href="?page=1">&laquo; first</a>
+      <a href="?page={{ corpora.previous_page_number }}">previous</a>
+      {% endif %}
+
+      <span class="current">
+	Page {{ corpora.number }} of {{ corpora.paginator.num_pages }}.
+      </span>
+
+      {% if corpora.has_next %}
+      <a href="?page={{ corpora.next_page_number }}">next</a>
+      <a href="?page={{ corpora.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+    </span>
+  </div>
+  <div class="corpus-items">
+    {% for corpus in corpora %}
+    <div class="row corpus-item">
+      <div class="col-sm-9">
+	{{ corpus }}
+      </div>
+      <div class="col-sm-3">
+	<form class="corpus-option" action="{% url 'annotate' %}"\
+	      method="post">
+	  {% csrf_token %}
+	  <button type="submit">
+	    <i class="fa fa-pencil-alt" style="color:green"></i>
+	  </button>
+	</form>
+	<form class="corpus-option" action="{% url 'delete' %}"\
+	      method="post">
+	  {% csrf_token %}
+	  <button type="submit">
+	    <i class="fa fa-times" style="color:red"></i>
+	  </button>
+	</form>
+      </div>
+    </div>
+    <div class="corpora-pagination">
+      <span class="step-links">
+	{% if corpora.has_previous %}
+	<a href="?page=1">&laquo; first</a>
+	<a href="?page={{ corpora.previous_page_number }}">previous</a>
+	{% endif %}
+
+	<span class="current">
+	  Page {{ corpora.number }} of {{ corpora.paginator.num_pages }}.
+	</span>
+
+	{% if corpora.has_next %}
+	<a href="?page={{ corpora.next_page_number }}">next</a>
+	<a href="?page={{ corpora.paginator.num_pages }}">last &raquo;</a>
+	{% endif %}
+      </span>
+      </div>
+  </div>
+</div>
+
+<div class="corpora-pagination">
+  <span class="step-links">
+    {% if corpora.has_previous %}
+    <a href="?page=1">&laquo; first</a>
+    <a href="?page={{ corpora.previous_page_number }}">previous</a>
+    {% endif %}
+
+    <span class="current">
+      Page {{ corpora.number }} of {{ corpora.paginator.num_pages }}.
+    </span>
+
+    {% if corpora.has_next %}
+    <a href="?page={{ corpora.next_page_number }}">next</a>
+    <a href="?page={{ corpora.paginator.num_pages }}">last &raquo;</a>
+    {% endif %}
+  </span>
+</div>

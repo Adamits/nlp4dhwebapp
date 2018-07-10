@@ -1,0 +1,71 @@
+.concordance-filters {
+    border-bottom: 2px solid #E8E8E8;
+    padding-bottom: 10px;
+}
+
+.concordance-filters label {
+    margin-right: 5px;
+}
+
+.concordance-filters input {
+    margin-right: 5px;
+}
+
+.concordance-results {
+    margin-top: 20px;
+}
+
+.concordance-result {
+    margin-top: 20px;
+}
+
+.concordance-result em {
+    background-color: #FFFF00;
+}
+
+.concordance-result em.agent {
+    background-color: #a3a9fa;
+}
+
+.concordance-result em.patient {
+    background-color: #73F377;
+}
+
+.concordance-result em.theme {
+    background-color: #ee6d6d;
+}
+
+#id_srl  {
+    list-style: none;
+}
+
+ul#id_srl  {
+    margin: 0;
+    padding: 0;
+}
+
+ul#id_srl li label {
+    margin: 0;
+    padding: 0;
+}
+
+.color-box {
+  float: left;
+  width: 10px;
+  height: 10px;
+  margin: 5px;
+  margin-top: 7px;
+  border: 1px solid rgba(0, 0, 0, .2);
+}
+
+.color-box.agent {
+  background: #a3a9fa;
+}
+
+.color-box.patient {
+  background: #73F377;
+}
+
+.color-box.theme {
+  background: #ee6d6d;
+}

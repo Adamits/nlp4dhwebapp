@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Analysis{% endblock %}</title>
+  </head>
+  <body>
+    {% block pagecontent %}
+    <div class="container analysis">
+      <h3>Analysis</h3>
+      <div class="concordance-filters">
+        <form action="analysis" method="post">
+          {% csrf_token %}
+          <div class="row form-group">
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label for="concordance-query">Query</label>
+                {{form.query}}
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <label >Semantic Roles</label>
+              <ul id="id_srl">
+                {% for c, t in form.srl.field.choices %}
+                <li>
+                  <label>
+                    <input type="checkbox" name="srl" value={{c}} id="id_srl_0" {% if c in form.srl.value %}checked{% endif %}>
+                    {{t}}
+                  </label>
+                  <span class="color-box {{t}}"></span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Query</button>
+        </form>
+      </div>
+      {% if analysis is not None %}
+        <div>
+          {% for tag, count in analysis.items %}
+            <div>
+              {{ tag }}: {{ count }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    {% endblock %}
+  </body>
+</html>

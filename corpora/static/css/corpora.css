@@ -1,0 +1,37 @@
+.corpora {
+
+}
+
+.corpus-items {
+    border: 2px solid #B8B8B8;
+    border-radius: 5px;
+    margin-top: 7.5px;
+    padding: 7.5px;
+}
+
+.corpus-item {
+    margin-top: 2.5px;
+}
+
+form.corpus-option {
+    float: left;
+}
+
+.corpus-option button {
+    border:0;
+    background:none;
+    cursor: pointer;
+}
+
+.corpora-pagination {
+    margin-top: 10px;
+}
+
+.corpora-pagination a {
+    padding-right: 5px;
+}
+
+.current {
+    padding-left: 2.5px;
+    padding-right: 2.5px;
+}

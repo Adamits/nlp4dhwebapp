@@ -1,0 +1,68 @@
+<div class="container corpora">
+    <h3>My Corpora</h3>
+    <div class="corpora-pagination">
+        <span class="step-links">
+          {% if corpora.has_previous %}
+              <a href="?page=1">&laquo; first</a>
+              <a href="?page={{ corpora.previous_page_number }}">previous</a>
+          {% endif %}
+
+          <span class="current">
+            Page {{ corpora.number }} of {{ corpora.paginator.num_pages }}.
+          </span>
+
+          {% if corpora.has_next %}
+              <a href="?page={{ corpora.next_page_number }}">next</a>
+              <a href="?page={{ corpora.paginator.num_pages }}">last &raquo;</a>
+          {% endif %}
+        </span>
+    </div>
+    <div class="corpus-items">
+        {% for corpus in corpora %}
+            <div class="row corpus-item">
+                <div class="col-sm-9">
+                    {{ corpus.name }}
+                </div>
+                <div class="col-sm-3">
+                    {% if corpus.is_annotated %}
+                        <span></span>
+                    {% else %}
+                    <form class="corpus-option" action="{% url 'annotate' %}" method="post">
+                        {% csrf_token %}
+                        <input type=hidden name='name' value={{ corpus.name }}/>
+                        <input type=hidden name='page' value={{ corpora.number }} />
+                        <button type="submit" data-toggle="tooltip" data-placement="top" title="Annotate Corpus">
+                            <i class="fa fa-pencil-alt" style="color:green"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                    <form class="corpus-option" action="{% url 'delete' %}"\
+                        method="post">
+                        {% csrf_token %}
+                        <input type=hidden name='name' value={{ corpus.name }}/>
+                        <input type=hidden name='page' value={{ corpora.number }} />
+                        <button type="submit" data-toggle="tooltip" data-placement="top" title="Delete Corpus">
+                            <i class="fa fa-times" style="color:red"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="corpora-pagination">
+    <span class="step-links">
+        {% if corpora.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ corpora.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+          Page {{ corpora.number }} of {{ corpora.paginator.num_pages }}.
+        </span>
+
+        {% if corpora.has_next %}
+            <a href="?page={{ corpora.next_page_number }}">next</a>
+            <a href="?page={{ corpora.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
