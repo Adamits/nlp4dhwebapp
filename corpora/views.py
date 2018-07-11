@@ -38,6 +38,7 @@ def concordance(request, q=None):
                             "num_sentences": num_sentences})
 
 def analysis(request):
+    analysis = None
     if request.method == 'POST':
         query_dict = request.POST
         form = AnalysisForm(query_dict)
@@ -45,7 +46,7 @@ def analysis(request):
         if form.is_valid():
             analysis = Corpus.analyze(form.cleaned_data)
     else:
-        form = AnalysisForm(initial={'max_examples': 100})
+        form = AnalysisForm()
 
     return render(request, 'analysis.html',
                     context={

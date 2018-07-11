@@ -79,10 +79,11 @@ class Sentence():
 
 class TextSpan():
     def __init__(self, args):
+        self.content = args.get("content")
+        self.span = args.get("span")
         self.srl = args.get("srl")
         self.ner = args.get("ner")
         self.dep = args.get("dep")
-        self.span = args.get("span")
 
     @classmethod
     def get_text_spans_from_response(c, response_args):

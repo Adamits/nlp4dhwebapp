@@ -1,4 +1,8 @@
 {
+    "settings": {
+        "index.max_result_window": "10000",
+        "index.max_inner_result_window": "1000000"
+    },
     "mappings": {
         "corpus": {
             "properties": {

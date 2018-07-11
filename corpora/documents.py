@@ -65,7 +65,6 @@ class Corpus():
         """
         results = Query.generate(args)
         text_spans = []
-
         # TextSpans are the innermost hits (2 nested levels deep)
         for corpus in results["hits"]["hits"]:
             # First nested field: sentence
@@ -80,9 +79,19 @@ class Corpus():
 
     @classmethod
     def analyze(c, args):
-        text_spans = Corpus.search_text_spans(args)
         # Just SRL right now, until we add more filters to form.
-        query_tags = args.get("srl")
+        query_tags = args.get("srl", [])
+        if not query_tags:
+            # If no tags in the query, just return the number of matches
+            sentences = Corpus.search_sentences(args, highlight_results=False)
+            print(" ".join([s.content for s in sentences]))
+            print(args.get("query"))
+            count = " ".join([s.content for s in sentences]).count(args.get("query"))
+            return {"matches": count}
+
+
+        text_spans = Corpus.search_text_spans(args)
+
         merged_tag_counts = dict.fromkeys(query_tags, 0)
         for ts in text_spans:
             for tag, val in ts.get_tag_counts(query_tags).items():
