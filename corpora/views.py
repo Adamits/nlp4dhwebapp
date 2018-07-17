@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from .utils import *
 from .forms import ConcordanceForm, AnalysisForm
 from .documents import Corpus, Graph
+from datetime import datetime
 
 import json
 
@@ -42,8 +43,7 @@ def concordance(request, q=None):
 
 def analysis(request):
     analysis = None
-    chart_type = None
-    chart_dict = {}
+    graph_response = ""
 
     if request.method == 'POST':
         query_dict = request.POST
@@ -51,29 +51,25 @@ def analysis(request):
 
         if form.is_valid():
             analysis = Corpus.analyze(form.cleaned_data)
-            print(analysis)
-            chart_type = form.cleaned_data.get("chart_type", "bar")
-            chart_labels = ["LABEL"]
-            tags = list(analysis.keys())
-            chart_datasets = [ \
-                                            {"label": t,
-                                             "data": [analysis.get(t)],
-                                             "backgroundColor": get_color(t)
-                                            } \
-                                        for t in tags]
-            chart_dict = {"labels": chart_labels, "datasets": chart_datasets}
+            graph_type = form.cleaned_data.get("chart_type", "bar")
+            graph_labels = list(analysis.keys())
+            # Test with date=now.
+            graph_dates = [datetime.now().strftime("%m/%d/%Y")]
+            graph_data = list(analysis.values())
+            graph = Graph(graph_dates, graph_labels, graph_data)
+
+            graph_response = graph.get_base64()
 
     else:
         form = AnalysisForm()
 
     return render(request, 'analysis.html',
-                    context={
-                                "form": form,
-                                "analysis": analysis,
-                                "chart_type": chart_type,
-                                "chart_data": json.dumps(chart_dict)
-                            }
-            )
+                context={
+                            "form": form,
+                            "analysis": analysis,
+                            "graph_img": graph_response
+                        })
+
 def get_graph(request):
     graph = Graph()
 

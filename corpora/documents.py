@@ -11,11 +11,14 @@ from .query import Query, Analyzer
 from .subdocuments import *
 
 # For graph
+from django.http import HttpResponse
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num
-import datetime
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
+import io
+import base64
+import numpy as np
 
 class Corpus():
     def __init__(self, name):
@@ -108,33 +111,32 @@ class Corpus():
         return merged_tag_counts
 
 class Graph():
-    def __init__(self, dates, labels, data):
-        self.dates = dates
+    def __init__(self, x, labels, data):
+        self.x = x
         self.labels = labels
         self.data = data
 
-    def get_response(self):
-        x = date2num(dates)
-        # Generate a range for scaling width of bars
-        x_scale = list(range(int(-len(x)/2), 0))
-        # Add 1 if odd
-        endrange = int(len(x)/2) if len(x) % 2 == 0 else int(len(x)/2)+1
-        x_scale += list(range(0, endrange))
+    def get_base64(self):
+        width = .1
+        fig=plt.figure()
+        ax=fig.add_subplot(111)
+
+        ind = np.arange(len(self.x))
         colors = ['r', 'g', 'b']
 
-        for i, tup in enumerate(data):
-            l, d = tup
-            ax.bar(x+x_scale[i]*0.2, d,width=0.2, color=colors[i], align='center')
+        for i, d in enumerate(self.data):
+            ax.bar(ind + i*width, d, width, color=colors[i], align='center')
 
-        plt.legend([l for l, d in data], loc='upper center', bbox_to_anchor=(0.5,-0.1))
-        ax.xaxis_date()
-        canvas=FigureCanvasAgg(fig)
+        plt.legend([l for l in self.labels], loc='upper right')
+        ax.set_xticks(ind + width)
+        ax.set_xticklabels(self.x)
+
+        canvas=FigureCanvas(fig)
         buf = io.BytesIO()
         plt.savefig(buf, format='png')
-        plt.close(fig)
-        response = HttpResponse(buf.getvalue(), content_type='image/png')
-
-        return response
+        buf.seek(0)  # rewind to beginning of file
+        fig_png = base64.b64encode(buf.getvalue())
+        return fig_png.decode('utf8')
 
     def save(self):
         pass

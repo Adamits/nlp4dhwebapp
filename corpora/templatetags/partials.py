@@ -10,7 +10,3 @@ def show_corpora(corpora):
 def show_nav(active):
     return {'active': active}
 
-@register.inclusion_tag('_graph.html')
-def show_graph(chart_type, chart_data):
-    return {'chart_type': chart_type, 'chart_data': chart_data}
-

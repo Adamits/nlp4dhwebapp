@@ -1,7 +1,7 @@
 {
     "settings": {
-        "index.max_result_window": "10000",
-        "index.max_inner_result_window": "1000000"
+        "index.max_result_window": "1000000000",
+        "index.max_inner_result_window": "1000000000"
     },
     "mappings": {
         "corpus": {
@@ -9,7 +9,7 @@
                 "name": {
                     "type": "keyword"
                 },
-                "created_at": {
+                "data": {
                     "type": "date"
                 },
                 "sentences": {

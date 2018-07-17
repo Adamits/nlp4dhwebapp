@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'elasticsearch_dsl',
     'corpora',
+    'chartjs',
 ]
 
 MIDDLEWARE = [
