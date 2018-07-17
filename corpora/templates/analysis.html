@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load partials %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -48,6 +49,7 @@
         </div>
       {% endif %}
     </div>
+    {% show_graph chart_type chart_data %}
     {% endblock %}
   </body>
 </html>

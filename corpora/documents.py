@@ -10,6 +10,13 @@ from lib.annotations import make_annotation_json
 from .query import Query, Analyzer
 from .subdocuments import *
 
+# For graph
+import matplotlib.pyplot as plt
+from matplotlib.dates import date2num
+import datetime
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+
 class Corpus():
     def __init__(self, name):
         self.name=name
@@ -44,6 +51,7 @@ class Corpus():
 
         Return: a list of sentences that match the criteria
         """
+        print(args)
         results = Query.generate(args)
         sentences = []
         highlights = []
@@ -98,6 +106,41 @@ class Corpus():
                 merged_tag_counts[tag] += val
 
         return merged_tag_counts
+
+class Graph():
+    def __init__(self, dates, labels, data):
+        self.dates = dates
+        self.labels = labels
+        self.data = data
+
+    def get_response(self):
+        x = date2num(dates)
+        # Generate a range for scaling width of bars
+        x_scale = list(range(int(-len(x)/2), 0))
+        # Add 1 if odd
+        endrange = int(len(x)/2) if len(x) % 2 == 0 else int(len(x)/2)+1
+        x_scale += list(range(0, endrange))
+        colors = ['r', 'g', 'b']
+
+        for i, tup in enumerate(data):
+            l, d = tup
+            ax.bar(x+x_scale[i]*0.2, d,width=0.2, color=colors[i], align='center')
+
+        plt.legend([l for l, d in data], loc='upper center', bbox_to_anchor=(0.5,-0.1))
+        ax.xaxis_date()
+        canvas=FigureCanvasAgg(fig)
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        plt.close(fig)
+        response = HttpResponse(buf.getvalue(), content_type='image/png')
+
+        return response
+
+    def save(self):
+        pass
+
+    def _get_color():
+        pass
 
 
 def matches_query(text, query):
