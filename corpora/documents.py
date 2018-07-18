@@ -90,25 +90,40 @@ class Corpus():
 
     @classmethod
     def analyze(c, args):
+        """
+        Note this expects the query to be comma delimited
+        So we split on comma and entertain multiple queries
+        """
+        queries = args.get("query").split(",")
+        # Get a list of [{query: ..., etc}, {query: ..., etc}]
+        # for all queries after splitting on ,
+        tags_args = args.copy()
+        tags_args.pop("query")
+        args_list = [tags_args.copy() for q in queries]
+        [a.update({"query": queries[i]})for i, a in enumerate(args_list)]
         # Just SRL right now, until we add more filters to form.
         query_tags = args.get("srl", [])
         if not query_tags:
             # If no tags in the query, just return the number of matches
-            sentences = Corpus.search_sentences(args, highlight_results=False)
-            print(" ".join([s.content for s in sentences]))
-            print(args.get("query"))
-            count = " ".join([s.content for s in sentences]).count(args.get("query"))
-            return {"matches": count}
+            return_dict = {}
+            for args in args_list:
+                sentences = Corpus.search_sentences(args, highlight_results=False)
+                print([s.content for s in sentences])
+                count = " ".join([s.content for s in sentences]).count(args.get("query"))
+                print(count)
+                return_dict[args.get("query")] = count
 
+            return return_dict
 
-        text_spans = Corpus.search_text_spans(args)
+        return_dict = dict.fromkeys(queries, 0)
+        for args in args_list:
+            text_spans = Corpus.search_text_spans(args)
 
-        merged_tag_counts = dict.fromkeys(query_tags, 0)
-        for ts in text_spans:
-            for tag, val in ts.get_tag_counts(query_tags).items():
-                merged_tag_counts[tag] += val
+            for ts in text_spans:
+                for tag, val in ts.get_tag_counts(query_tags).items():
+                    return_dict[args.get("query")] += val
 
-        return merged_tag_counts
+        return return_dict
 
 class Graph():
     def __init__(self, x, labels, data):
@@ -122,26 +137,23 @@ class Graph():
         ax=fig.add_subplot(111)
 
         ind = np.arange(len(self.x))
-        colors = ['r', 'g', 'b']
 
         for i, d in enumerate(self.data):
-            ax.bar(ind + i*width, d, width, color=colors[i], align='center')
+            ax.bar(ind + i*width, d, width, align='center')
 
         plt.legend([l for l in self.labels], loc='upper right')
-        ax.set_xticks(ind + width)
+        ax.set_xticks(ind + width/2)
         ax.set_xticklabels(self.x)
 
         canvas=FigureCanvas(fig)
         buf = io.BytesIO()
         plt.savefig(buf, format='png')
+        plt.close(fig)
         buf.seek(0)  # rewind to beginning of file
         fig_png = base64.b64encode(buf.getvalue())
         return fig_png.decode('utf8')
 
     def save(self):
-        pass
-
-    def _get_color():
         pass
 
 

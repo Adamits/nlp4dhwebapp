@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.http import JsonResponse
 from .utils import *
 from .forms import ConcordanceForm, AnalysisForm
 from .documents import Corpus, Graph
