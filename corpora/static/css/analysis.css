@@ -5,3 +5,8 @@
 .graph-save {
   text-align: center;
 }
+
+.graph .form-submit .btn {
+  top:   32px;
+  position: relative;
+}

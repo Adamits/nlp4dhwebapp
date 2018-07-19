@@ -41,26 +41,24 @@
       </div>
       {% if analysis is not None %}
         <div class="row graph">
-          <div class="col-sm-6 offset-sm-3">
+          <div class="col-sm-8 offset-sm-2">
             <img src="data:image/gif;base64,{{figure}}" width="100%">
-            <div class="graph">
-              <form id="save-graph-form" method="post">
-                {% csrf_token %}
-                <div class="row">
-                  <div class="col-sm-4">
-                    <label for="graph-name">Name</label>
-                    {{ graph_form.name }}
-                  </div>
-                  <div class="col-sm-4">
-                    <label for="graph-file-type">File Type</label>
-                    {{ graph_form.file_type }}
-                  </div>
-                  <div class="col-sm-4">
-                    <input type="submit" class="btn btn-primary" value="Save Graph">
-                  </div>
+            <form id="save-graph-form" method="post">
+              {% csrf_token %}
+              <div class="row">
+                <div class="col-sm-4">
+                  <label for="graph-name">Name</label>
+                  {{ graph_form.name }}
                 </div>
-              </form>
-            </div>
+                <div class="col-sm-4">
+                  <label for="graph-file-type">File Type</label>
+                  {{ graph_form.file_type }}
+                </div>
+                <div class="col-sm-4 form-submit">
+                  <input type="submit" class="btn btn-primary" value="Save Graph">
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       {% endif %}

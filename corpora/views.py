@@ -81,13 +81,14 @@ def graph(request):
         if form.is_valid():
             data = form.cleaned_data
             graph_name = data.get("name")
+            graph_type = data.get("file_type")
             # There will be a Graph object in the session
             # If there was a query
             graph = request.session.get('graph', None)
             if graph is not None:
                 graph = pickle.loads(graph)
-                print(graph)
-                pdf_path = graph.get_PDF(graph_name)
+                pdf_path = graph.save_as(graph_name, graph_type)
+
                 return JsonResponse({"message": "Successfully saved to %s" % pdf_path})
 
     return JsonResponse({"message": ", ".join([e for e in form.errors])})

@@ -31,4 +31,8 @@ class GraphForm(forms.Form):
                             widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     file_type = forms.CharField(required=True,\
-                                widget=forms.Select(choices=[("PDF", "pdf")]))
+                                widget=forms.Select(choices=[("PDF", "pdf"),
+                                                             ("PNG", "png")
+                                                            ],
+                                                    attrs={'class': 'form-control'})
+                                )

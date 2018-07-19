@@ -156,17 +156,31 @@ class Graph():
         fig_png = base64.b64encode(buf.getvalue())
         return fig_png.decode('utf8')
 
-    def get_PDF(self, fn):
+    def save_PDF(self, fn):
         pdf_path = settings.CORPORA_DIR + fn + '.pdf'
         f = self.figure
-        canvas = FigureCanvas(f)
-        print(f)
-        f.savefig(pdf_path)
+
+        pp = PdfPages(pdf_path)
+        pp.savefig(f)
+        pp.close()
 
         return pdf_path
 
-    def save_as(self, type):
-        pass
+    def save_PNG(self, fn):
+        png_path = settings.CORPORA_DIR + fn + '.png'
+        f = self.figure
+        FigureCanvas(f)
+        f.savefig(png_path)
+
+        return png_path
+
+    def save_as(self, fn, f_type):
+        if f_type.lower() == "pdf":
+            return self.save_PDF(fn)
+        elif f_type.lower() == "png":
+            return self.save_PNG(fn)
+        else:
+            raise Exception("Unimplemented filetype: %s" % f_type)
 
 
 def matches_query(text, query):
