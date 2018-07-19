@@ -19,6 +19,7 @@ from matplotlib.figure import Figure
 import io
 import base64
 import numpy as np
+from matplotlib.backends.backend_pdf import PdfPages
 
 class Corpus():
     def __init__(self, name):
@@ -54,7 +55,6 @@ class Corpus():
 
         Return: a list of sentences that match the criteria
         """
-        print(args)
         results = Query.generate(args)
         sentences = []
         highlights = []
@@ -108,9 +108,7 @@ class Corpus():
             return_dict = {}
             for args in args_list:
                 sentences = Corpus.search_sentences(args, highlight_results=False)
-                print([s.content for s in sentences])
                 count = " ".join([s.content for s in sentences]).count(args.get("query"))
-                print(count)
                 return_dict[args.get("query")] = count
 
             return return_dict
@@ -130,8 +128,10 @@ class Graph():
         self.x = x
         self.labels = labels
         self.data = data
+        self.figure = None
+        self.figure = self.figure if self.figure else self._make_figure()
 
-    def get_base64(self):
+    def _make_figure(self):
         width = .1
         fig=plt.figure()
         ax=fig.add_subplot(111)
@@ -145,7 +145,10 @@ class Graph():
         ax.set_xticks(ind + width/2)
         ax.set_xticklabels(self.x)
 
-        canvas=FigureCanvas(fig)
+        return fig
+
+    def get_base64(self):
+        fig = self.figure
         buf = io.BytesIO()
         plt.savefig(buf, format='png')
         plt.close(fig)
@@ -153,7 +156,16 @@ class Graph():
         fig_png = base64.b64encode(buf.getvalue())
         return fig_png.decode('utf8')
 
-    def save(self):
+    def get_PDF(self, fn):
+        pdf_path = settings.CORPORA_DIR + fn + '.pdf'
+        f = self.figure
+        canvas = FigureCanvas(f)
+        print(f)
+        f.savefig(pdf_path)
+
+        return pdf_path
+
+    def save_as(self, type):
         pass
 
 

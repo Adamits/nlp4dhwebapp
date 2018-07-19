@@ -40,14 +40,29 @@
         </form>
       </div>
       {% if analysis is not None %}
-        <div>
-          {% for tag, count in analysis.items %}
-            <div>
-              {{ tag }}: {{ count }}
+        <div class="row graph">
+          <div class="col-sm-6 offset-sm-3">
+            <img src="data:image/gif;base64,{{figure}}" width="100%">
+            <div class="graph">
+              <form id="save-graph-form" method="post">
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-sm-4">
+                    <label for="graph-name">Name</label>
+                    {{ graph_form.name }}
+                  </div>
+                  <div class="col-sm-4">
+                    <label for="graph-file-type">File Type</label>
+                    {{ graph_form.file_type }}
+                  </div>
+                  <div class="col-sm-4">
+                    <input type="submit" class="btn btn-primary" value="Save Graph">
+                  </div>
+                </div>
+              </form>
             </div>
-          {% endfor %}
+          </div>
         </div>
-        <img src="data:image/gif;base64,{{graph_img}}">
       {% endif %}
     </div>
     {% endblock %}

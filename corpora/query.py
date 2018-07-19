@@ -49,7 +49,6 @@ class Query():
                 inner_hits=inner_hits_dict
             )
 
-        print(s.to_dict())
         return es.search(index="corpus", body=s.to_dict(), size=max_examples_dict["size"])
 
     @classmethod
@@ -67,7 +66,6 @@ class Query():
                 inner_hits={}
             )
 
-        print(s.to_dict())
         return es.search(index="corpus", body=s.to_dict(), size=args.get("max_examples"))
 
 

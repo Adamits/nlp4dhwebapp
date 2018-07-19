@@ -25,3 +25,10 @@ class AnalysisForm(forms.Form):
                                              ("theme", "theme")],\
                                     widget=forms.CheckboxSelectMultiple(),
                                     required=False)
+class GraphForm(forms.Form):
+    name = forms.CharField(label="Name",
+                            required=True,
+                            widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    file_type = forms.CharField(required=True,\
+                                widget=forms.Select(choices=[("PDF", "pdf")]))

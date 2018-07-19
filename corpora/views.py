@@ -3,11 +3,12 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect
 from django.urls import reverse
 from .utils import *
-from .forms import ConcordanceForm, AnalysisForm
+from .forms import ConcordanceForm, AnalysisForm, GraphForm
 from .documents import Corpus, Graph
 from datetime import datetime
 
-import json
+from django.http import JsonResponse
+import pickle
 
 def index(request):
     corpora_names = get_corpora_names()
@@ -43,6 +44,8 @@ def concordance(request, q=None):
 def analysis(request):
     analysis = None
     graph_response = ""
+    fig = None
+    graph_form = GraphForm()
 
     if request.method == 'POST':
         query_dict = request.POST
@@ -58,6 +61,7 @@ def analysis(request):
             graph = Graph(graph_dates, graph_labels, graph_data)
 
             graph_response = graph.get_base64()
+            request.session['graph'] = pickle.dumps(graph)
 
     else:
         form = AnalysisForm()
@@ -65,15 +69,28 @@ def analysis(request):
     return render(request, 'analysis.html',
                 context={
                             "form": form,
+                            "graph_form": graph_form,
                             "analysis": analysis,
-                            "graph_img": graph_response
+                            "figure": graph_response
                         })
 
-def get_graph(request):
-    graph = Graph()
+def graph(request):
+    if request.method == 'POST':
+        args_dict = request.POST
+        form = GraphForm(args_dict)
+        if form.is_valid():
+            data = form.cleaned_data
+            graph_name = data.get("name")
+            # There will be a Graph object in the session
+            # If there was a query
+            graph = request.session.get('graph', None)
+            if graph is not None:
+                graph = pickle.loads(graph)
+                print(graph)
+                pdf_path = graph.get_PDF(graph_name)
+                return JsonResponse({"message": "Successfully saved to %s" % pdf_path})
 
-def save_graph(request):
-    pass
+    return JsonResponse({"message": ", ".join([e for e in form.errors])})
 
 def annotate(request):
     name = request.POST.get('name')
