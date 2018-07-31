@@ -1,6 +1,8 @@
 import datetime
 from django.http import HttpResponse
 
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
@@ -30,11 +32,3 @@ if __name__=='__main__':
 
   plt.legend([l for l, d in data], loc='upper center', bbox_to_anchor=(0.5,-0.1))
   ax.xaxis_date()
-  #canvas=FigureCanvasAgg(fig)
-  #buf = io.BytesIO()
-  #plt.savefig(buf, format='png')
-  #plt.close(fig)
-  #response = HttpResponse(buf.getvalue(), content_type='image/png')
-  plt.show()
-
-  #print(response)

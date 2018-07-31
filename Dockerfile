@@ -1,4 +1,4 @@
-FROM adamits/nlp4dh
+FROM nlp4dh:develop
 
 COPY . webapp
 

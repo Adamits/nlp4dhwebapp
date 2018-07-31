@@ -7,7 +7,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAPPING_FILE = os.path.join(BASE_DIR, 'mappings/corpus_index_mapping.json')
 
 if __name__=='__main__':
-  es = Elasticsearch(["http://localhost:9200"])
+  es = Elasticsearch(["http://elasticsearch:9200"])
   with open(MAPPING_FILE) as f:
     mapping = json.load(f)
 

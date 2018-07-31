@@ -22,6 +22,10 @@
               </div>
             </div>
             <div class="col-sm-4">
+              <label for="concordance-dates">Years</label>
+              {{form.years}}
+            </div>
+            <div class="col-sm-4">
               <label >Semantic Roles</label>
               <ul id="id_srl">
                 {% for c, t in form.srl.field.choices %}

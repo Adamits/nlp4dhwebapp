@@ -9,14 +9,15 @@
                 "name": {
                     "type": "keyword"
                 },
-                "data": {
-                    "type": "date"
+                "year": {
+                    "type": "keyword"
                 },
                 "sentences": {
                     "type": "nested",
                     "properties": {
                         "content": {
-                            "type": "text"
+                            "type": "text",
+                            "fielddata": "true"
                         },
                         "textSpans": {
                             "type": "nested"

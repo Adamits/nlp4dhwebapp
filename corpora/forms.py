@@ -1,5 +1,10 @@
 from django import forms
 
+class CorpusForm(forms.Form):
+    year = forms.DateField(label="Year",
+                            required=True,
+                            widget=forms.DateInput(attrs={'class': 'form-control'}))
+
 class ConcordanceForm(forms.Form):
     query = forms.CharField(label="Query",
                             required=False,
@@ -24,7 +29,13 @@ class AnalysisForm(forms.Form):
                                              ("patient", "patient"),\
                                              ("theme", "theme")],\
                                     widget=forms.CheckboxSelectMultiple(),
-                                    required=False)
+                                    required=False
+    )
+    years = forms.CharField(label="Years",
+                            required=False,
+                            widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
 class GraphForm(forms.Form):
     name = forms.CharField(label="Name",
                             required=True,

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load partials %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}NLP4DH{% endblock %}</title>
+    </head>
+    <body>
+        {% block pagecontent %}
+        <div class="corpus">
+                <h5>
+                    {{ corpus.name }}
+                </h5>
+            <form action="edit" method="post">
+                {% csrf_token %}
+                <div class="corpus-item corpus-date">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label for="id_date">Year</label>
+                            {{form.year}}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-submit">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+        {% endblock %}
+    </body>
+</html>

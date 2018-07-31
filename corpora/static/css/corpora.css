@@ -13,6 +13,21 @@
     margin-top: 2.5px;
 }
 
+.corpus .corpus-date {
+    margin-top: 5px;
+}
+
+.corpus .corpus-text {
+    border-top: 2px solid #B8B8B8;
+    font-size: 12px;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.corpus .form-submit {
+    margin-top: 10px;
+}
+
 form.corpus-option {
     float: left;
 }

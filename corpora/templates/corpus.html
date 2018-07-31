@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load partials %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{% block title %}NLP4DH{% endblock %}</title>
+  </head>
+  <body>
+    {% block pagecontent %}
+    <div class="corpus">
+        <div class="row">
+            <div class="col-sm-10">
+                <h5>
+                    {{ corpus.name }}
+                </h5>
+            </div>
+            <div class="col-sm-2">
+                <a href="{{corpus.name}}/edit">edit</a>
+            </div>
+        </div>
+        <div class="corpus-item">
+            <b>Date:</b> {{corpus.get_year}}
+        </div>
+        <div class="corpus-item corpus-text">
+            {{corpus.get_text}}
+        </div>
+    </div>
+    {% endblock %}
+  </body>
+</html>
