@@ -10,14 +10,18 @@ if __name__=='__main__':
   es = Elasticsearch(["http://elasticsearch:9200"])
   with open(MAPPING_FILE) as f:
     mapping = json.load(f)
-
   r = ""
   # Try creating index 3 times
   i=0
   failed = True
   while failed and i < 3:
     try:
+      # JUST HERE WHILE WE ARE DEVELOPING AND MAKING CHANGES TO SCHEMA
+      # THIS DELETES CURRENT SCHEMA, AKA ALL ANNOTATED DOCS
+      d = es.indices.delete(index='corpus', ignore=[404, 400])
+      print(d)
       r = es.indices.create(index='corpus', body=mapping)
+      print(r)
       failed = False
     except:
       # If it errors, wait 6 seconds for server to bootup

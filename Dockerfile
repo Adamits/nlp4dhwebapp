@@ -1,4 +1,4 @@
-FROM nlp4dh:develop
+FROM nlp4dh:latest
 
 COPY . webapp
 

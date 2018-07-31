@@ -107,8 +107,6 @@ def analysis(request):
             graph_labels = list(analysis.keys())
             if Query.is_aggregation_query(form.cleaned_data):
                 # Data should be [#keywords x #years]
-                print("AGGREGATE!")
-                print(analysis.values())
                 graph_data = [list(y.values()) for y in analysis.values()]
             else:
                 # Even if no years, data should be a list of lists

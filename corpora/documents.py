@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Document, DocType, Search, Index, Text, Integer, Q
+from elasticsearch_dsl import DocType, Search, Index, Text, Integer, Q
 from elasticsearch import Elasticsearch, helpers
 from elasticsearch_dsl.connections import connections
 
