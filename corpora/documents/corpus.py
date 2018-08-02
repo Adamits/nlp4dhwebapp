@@ -6,27 +6,29 @@ from django.conf import settings
 import sys
 import os
 sys.path.append(settings.NLP4DH_DIR)
-from lib.annotations import make_annotation_json
+from lib.annotations import make_annotation_json, bulk_make_annotation_json
 
-from .query import Query, Analyzer
+from ..query import Query, Analyzer
 from .subdocuments import *
-
-# For graph
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-from matplotlib.dates import date2num
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
-import io
-import base64
-import numpy as np
-from matplotlib.backends.backend_pdf import PdfPages
 
 connections.create_connection(hosts=[settings.ES_URL])
 es = Elasticsearch([settings.ES_URL])
 
-class Corpus():
+"""
+The corpus class is for interfacing with each text document whose data we care about.
+Probably should be called TextDocument, but in this app, it is called a Corpus.
+
+A Corpus is a wrapper over both the text file, whose name needs to be known, as well
+as the anntotated version of that text file, which is stored in an elasticsearhc index.
+The methods annotate() and bulk_annotate() will do the heavy lifting of parsing and indexing
+the corproa into the elasticsearch back-end. Note that the parsing portion relies on
+make_annotation_json, which is in the NLP4DH docker container that this webapp sits on top of.
+
+Currently, there are tons of ad-hoc classmethods, such that Corpus mostly serves as a namespace.
+These can likely be organized better, and elasticsearch-py-dsl can be used more for simpler queries.
+"""
+
+class Corpus:
     def __init__(self, name, cid=None, year=None):
         self.name = name
         self.id = cid
@@ -40,6 +42,16 @@ class Corpus():
             s = Search().query("match", name=self.name)
             for hit in s:
                 return hit.meta.id
+
+    @classmethod
+    def get_ids(c, names):
+        name_queries = [Q("match", name=name) for name in names]
+        s = Search().query("bool", should=name_queries)
+        ids = []
+        for hit in s:
+            ids.append(hit.meta.id)
+
+        return ids
 
     def is_annotated(self):
         """
@@ -80,7 +92,23 @@ class Corpus():
         """
         annotation_json = make_annotation_json(self.filename)
         x=es.index(index='corpus', doc_type='corpus', body=annotation_json)
-        self._es_update_callback()
+        Corpus._es_update_callback()
+
+        return x
+
+    @classmethod
+    def bulk_annotate(c, names):
+        """
+        names: the names of the txt files to be annotated
+        """
+        corpora = [Corpus(name) for name in names]
+        filenames = [c.filename for c in corpora if not c.is_annotated()]
+        annotation_jsons = bulk_make_annotation_json(filenames)
+        x=None
+        for annotation_json in annotation_jsons:
+            x=es.index(index='corpus', doc_type='corpus', body=annotation_json)
+
+        Corpus._es_update_callback()
 
         return x
 
@@ -97,7 +125,7 @@ class Corpus():
                         }
                      }
                 )
-        self._es_update_callback()
+        Corpus._es_update_callback()
 
         return x
 
@@ -107,7 +135,20 @@ class Corpus():
         and delete it.
         """
         x=es.delete(index='corpus', doc_type="corpus", id=self.id)
-        self._es_update_callback()
+        Corpus._es_update_callback()
+
+        return x
+
+    @classmethod
+    def bulk_delete(c, names):
+        """
+        Find the indexed es document corresponding to this instance
+        and delete it.
+        """
+        name_queries = [Q("match", name=name) for name in names]
+        s = Search().query("bool", should=name_queries)
+        x=es.delete_by_query(index='corpus', body=s.to_dict())
+        Corpus._es_update_callback()
 
         return x
 
@@ -168,6 +209,28 @@ class Corpus():
             text_spans += Corpus._get_text_spans_from_corpus_doc(corpus)
 
         return text_spans
+
+    @classmethod
+    def count_text_spans_by_query(c, args):
+        """
+        Generates an ES query.
+
+        Return: dict of {query_term: {tag: count, tag: count}, query_term: ...}
+        """
+        # Right now all tags are just SRL
+        query_tags = args.get("srl", [])
+        # Split into a list of separate query args for each query
+        queries, args_list = Corpus._split_args(args)
+        return_dict = {k: {} for k in queries}
+        for args in args_list:
+            query_dict = return_dict[args.get("query")]
+            text_spans = Corpus.search_text_spans(args)
+            for ts in text_spans:
+                for tag, val in ts.get_tag_counts(query_tags).items():
+                    query_dict.setdefault(tag, 0)
+                    query_dict[tag] += val
+
+        return return_dict
 
     @classmethod
     def aggregate_text_spans(c, args):
@@ -327,83 +390,9 @@ class Corpus():
 
         return (queries, args_list)
 
-    def _es_update_callback(self):
+    @classmethod
+    def _es_update_callback(c):
         # NEED TO FORCE REFRESH SO NEXT QUERY IS ACCURATE
         # - elasticsearch is known to take a second to update
         # (possibly a caching type issue?), so we force refresh
         es.indices.refresh(index="corpus")
-
-class Graph():
-    def __init__(self, x, labels, data):
-        # Should be the years
-        self.x = x
-        # Should be the queries
-        self.labels = labels
-        # x axis labels, by # bars per label
-        # aka, queries x years
-        self.data = data
-        self.figure = None
-        self.figure = self.figure if self.figure else self._make_figure()
-
-    def _make_figure(self):
-        width = .1
-        fig=plt.figure()
-        ax=fig.add_subplot(111)
-
-        idx = np.arange(len(self.x))
-
-        for i, d in enumerate(self.data):
-            coords = [i*width+j for j in range(len(d))]
-            ax.bar(coords, height=d, width=width, align='center')
-
-        plt.legend(self.labels, loc='upper right')
-        ax.set_xticks([x + width for x in idx])
-        ax.set_xticklabels(self.x)
-
-        return fig
-
-    def get_base64(self):
-        fig = self.figure
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        plt.close(fig)
-        buf.seek(0)  # rewind to beginning of file
-        fig_png = base64.b64encode(buf.getvalue())
-        return fig_png.decode('utf8')
-
-    def save_PDF(self, fn):
-        pdf_path = settings.CORPORA_DIR + fn + '.pdf'
-        f = self.figure
-
-        pp = PdfPages(pdf_path)
-        pp.savefig(f)
-        pp.close()
-
-        return pdf_path
-
-    def save_PNG(self, fn):
-        png_path = settings.CORPORA_DIR + fn + '.png'
-        f = self.figure
-        FigureCanvas(f)
-        f.savefig(png_path)
-
-        return png_path
-
-    def save_as(self, fn, f_type):
-        if f_type.lower() == "pdf":
-            return self.save_PDF(fn)
-        elif f_type.lower() == "png":
-            return self.save_PNG(fn)
-        else:
-            raise Exception("Unimplemented filetype: %s" % f_type)
-
-
-def matches_query(text, query):
-    """
-    Need to check (again) if the tag content matches
-    the original string query.
-
-    As we expose more options to the user, this will need to be updated
-    with those options. E.g. regex, case sensitive, etc.
-    """
-    return query.lower() in text.lower()

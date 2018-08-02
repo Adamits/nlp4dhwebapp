@@ -2,6 +2,14 @@
 
 }
 
+#corpus-annotate-btn {
+    margin-top: 12.5px;
+}
+
+#corpus-delete-btn {
+    margin-top: 12.5px;
+}
+
 .corpus-items {
     border: 2px solid #B8B8B8;
     border-radius: 5px;

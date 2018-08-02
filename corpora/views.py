@@ -6,7 +6,9 @@ from django.views import View
 
 from .utils import *
 from .forms import ConcordanceForm, AnalysisForm, GraphForm, CorpusForm
-from .documents import Corpus, Graph
+from .documents.corpus import Corpus
+from .documents.graph import Graph
+from .documents.counts_file import CountsFile
 from .query import Query
 from datetime import datetime
 
@@ -17,7 +19,7 @@ def index(request):
     corpora_names = get_corpora_names()
     corpora = [Corpus(name) for name in corpora_names]
 
-    paginator = Paginator(corpora, 20)
+    paginator = Paginator(corpora, 50)
     page = request.GET.get('page')
     paginated_corpora = paginator.get_page(page)
 
@@ -53,18 +55,16 @@ def edit_corpus(request, name):
                                  "form": form})
 
 def annotate(request):
-    name = request.POST.get('name')
-    name = name.rstrip('/')
-    corpus = Corpus(name)
-    a = corpus.annotate()
+    names = request.POST.getlist('name')
+    names = [name.rstrip('/') for name in names]
+    a = Corpus.bulk_annotate(names)
 
     return redirect('/corpora?page=%s' % request.POST.get('page'))
 
 def delete(request):
-    idx = request.POST.get('id')
-    corpus = Corpus.get_by_id(idx)
-    if corpus:
-        x=corpus.delete()
+    names = request.POST.getlist('name')
+    names = [name.rstrip('/') for name in names]
+    Corpus.bulk_delete(names)
 
     return redirect('/corpora?page=%s' % request.POST.get('page'))
 
@@ -127,6 +127,20 @@ def analysis(request):
                             "analysis": analysis,
                             "figure": graph_response
                         })
+
+def download_counts(request):
+    analysis = None
+    counts_file = CountsFile(args=None)
+    if request.method == 'POST':
+        query_dict = request.POST
+        form = AnalysisForm(query_dict)
+        if form.is_valid():
+            counts_file = CountsFile(form.cleaned_data)
+            counts_file.make_counts()
+            print(counts_file.str)
+
+
+    return JsonResponse({"counts": counts_file.str})#", ".join([e for e in form.errors])})
 
 def graph(request):
     if request.method == 'POST':

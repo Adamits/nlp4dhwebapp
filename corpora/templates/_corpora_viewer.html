@@ -17,46 +17,50 @@
           {% endif %}
         </span>
     </div>
+    <button type="submit" id="corpus-annotate-btn" class="btn btn-primary corpora-submit-btn">Annotate</button>
+    <button type="submit" id="corpus-delete-btn" class="btn btn-danger corpora-submit-btn">Delete</button>
     <div class="corpus-items">
-        {% for corpus in corpora %}
-            <div class="row corpus-item">
-                <div class="col-sm-8">
-                    <a href="/corpora/{{corpus.name}}">
-                        {{corpus.name}}
-                    </a>
-                </div>
-                <div class="col-sm-2">
-                    {% if corpus.is_annotated %}
-                        <span></span>
-                    {% else %}
-                    <form class="corpus-option" action="{% url 'annotate' %}" method="post">
-                        {% csrf_token %}
-                        <input type=hidden name='name' value={{ corpus.name }}/>
-                        <input type=hidden name='page' value={{ corpora.number }} />
-                        <button type="submit" data-toggle="tooltip" data-placement="top" title="Annotate Corpus">
-                            <i class="fa fa-pencil-alt" style="color:green"></i>
-                        </button>
-                    </form>
-                    {% endif %}
-                    <form class="corpus-option" action="{% url 'delete' %}"\
-                        method="post">
-                        {% csrf_token %}
-                        <input type=hidden name="id"\
-                         value={{ corpus.get_id|default_if_none:"" }}>
-                        </input>
-                        <input type=hidden name="page" value={{ corpora.number }} />
-                        <button type="submit" data-toggle="tooltip" data-placement="top" title="Delete Corpus">
-                            <i class="fa fa-times" style="color:red"></i>
-                        </button>
-                    </form>
-                </div>
-                <div class="col-sm-2">
-                    {% if corpus.get_year %}
-                        {{corpus.get_year}}
-                    {% endif %}
-                </div>
+        <div class="row corpus-item">
+            <div class="col-sm-8">
+                <h5>Name</h5>
             </div>
-        {% endfor %}
+            <div class="col-sm-2">
+                <h5>Date</h5>
+            </div>
+            <div class="col-sm-2">
+                <button id="corpora-select-all" class="btn btn-link">select all</button>
+            </div>
+        </div>
+        <form id="corpora-form" method="post">
+            {% csrf_token %}
+            {% for corpus in corpora %}
+                <div class="row corpus-item">
+                    <div class="col-sm-8">
+                        {% if corpus.is_annotated %}
+                            <i class="fa fa-pencil-alt" style="color:green"></i>
+                            <a href="/corpora/{{corpus.name}}">
+                                {{corpus.name}}
+                            </a>
+                        {% else %}
+                            <i class="fa fa-pencil-alt" style="color:white"></i>
+                            {{corpus.name}}
+                        {% endif %}
+                    </div>
+
+                    <div class="col-sm-2">
+                        {% if corpus.get_year %}
+                            {{corpus.get_year}}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-2">
+                        <input class="corpus-checkbox" name="name" value={{ corpus.name }}  type="checkbox">
+                    </div>
+                </div>
+            {% endfor %}
+            <input type=hidden name='page' value={{ corpora.number }} />
+        </form>
     </div>
     <div class="corpora-pagination">
     <span class="step-links">
