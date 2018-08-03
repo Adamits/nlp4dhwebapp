@@ -1,3 +1,4 @@
+from django.conf import settings
 from ..query import Query
 import matplotlib as mpl
 mpl.use('Agg')

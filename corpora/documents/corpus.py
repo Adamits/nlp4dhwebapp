@@ -317,10 +317,10 @@ class Corpus:
                 else:
                     sentences = Corpus.search_sentences(args, highlight_results=False)
                     # TODO this needs to count per ES term counts,
-                        # otherwise it only looks for string literal
-                        # For now use lower b/c that seems to be what ES does..
-                        # Long term solution is probably to let a user define the regex themselves
-                        # and then use that in both ES query, and count.
+                    # otherwise it only looks for string literal
+                    # For now use lower b/c that seems to be what ES does..
+                    # Long term solution is probably to let a user define the regex themselves
+                    # and then use that in both ES query, and count.
                     return_dict[args.get("query")] += \
                                 " ".join([s.content.lower() for s in sentences]).count(args.get("query").lower())
 
