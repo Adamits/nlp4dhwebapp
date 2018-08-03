@@ -64,7 +64,6 @@ class Query():
         Generate a similar query to generate(), but aggregate by some term.
         """
         s, max_examples_dict = self._make_search()
-
         if aggregate_by == "years":
             years = [y.strip() for y in self.args.get("years").split(",")]
             s = s.query('terms', year=years)
@@ -75,13 +74,16 @@ class Query():
             response = s.execute()
             return response.aggregations.to_dict()['by_years']['buckets']
         elif aggregate_by == "tags":
+            # This does not aggregate by SRL tags.
+            # Not sure if its an issue with nested aggs
+            # Or if an update to the schema is needed.
+            # e.g. sentences.textSpans.srl points to a dict, and we want to
+            # Aggregate by the keys to that dict. Maybe need a tags: [] field.
             s.aggs.bucket('sentences', 'nested', path='sentences')\
                 .bucket('by_tags', 'terms', field='sentences.textSpans.srl')\
                 .bucket("all", "top_hits", size="200000")
 
             response = s.execute()
-            print(response.aggregations.to_dict()['sentences'])
-            print(response.aggregations.to_dict()['sentences']['by_tags'])
             return response.aggregations.to_dict()['sentences']['by_tags']['buckets']
         else:
             raise Exception("No aggregation implemented for %s" % aggregate_by)

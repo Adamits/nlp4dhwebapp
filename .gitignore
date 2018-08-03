@@ -1,2 +1,4 @@
 *.pyc
 *.pyo
+webapp/__pycache__
+db.sqlite3

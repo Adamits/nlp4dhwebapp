@@ -270,7 +270,7 @@ class Corpus:
 
         **Note that right now aggragations (e.g. agg_term) are ONLY by year
         """
-        results = query.generate_aggregate_query(args)
+        results = query.generate_aggregate_query(aggregate_by=args.get("x_axis"))
         # Only aggregating by years...
         years = [y.strip() for y in args.get("years").split(",")]
         aggs_dict = {y: [] for y in years}

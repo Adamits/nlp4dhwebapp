@@ -127,7 +127,6 @@ def analysis(request):
         form = AnalysisForm(query_dict)
         if form.is_valid():
             analysis = Corpus.analyze(form.cleaned_data)
-            print(analysis)
             graph = Graph.get_from_args(form.cleaned_data, analysis)
 
             graph_response = graph.get_base64()
@@ -158,8 +157,6 @@ def download_counts(request):
         if form.is_valid():
             counts_file = CountsFile(form.cleaned_data)
             counts_file.make_counts()
-            print(counts_file.str)
-
 
     return JsonResponse({"counts": counts_file.str})#", ".join([e for e in form.errors])})
 
