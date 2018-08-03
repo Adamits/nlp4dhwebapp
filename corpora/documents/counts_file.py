@@ -1,6 +1,7 @@
 """
 A CountsFile is specifically the counts of query/tag combinations that
-can be output in a tsv format in a txt file.
+can be output in a tsv format in a txt file. Also extending to showing
+distributions or percentages. SHould the name be changed accordingly? StatsFile?
 """
 from .corpus import Corpus
 

@@ -3,6 +3,10 @@ import os
 import json
 from time import sleep
 
+"""
+For generating the ES schema from the specification in corpus_index_mapping.json
+"""
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAPPING_FILE = os.path.join(BASE_DIR, 'mappings/corpus_index_mapping.json')
 
@@ -18,8 +22,8 @@ if __name__=='__main__':
     try:
       # JUST HERE WHILE WE ARE DEVELOPING AND MAKING CHANGES TO SCHEMA
       # THIS DELETES CURRENT SCHEMA, AKA ALL ANNOTATED DOCS
-      d = es.indices.delete(index='corpus', ignore=[404, 400])
-      print(d)
+      #d = es.indices.delete(index='corpus', ignore=[404, 400])
+      #print(d)
       r = es.indices.create(index='corpus', body=mapping)
       print(r)
       failed = False

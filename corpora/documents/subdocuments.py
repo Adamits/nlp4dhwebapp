@@ -5,6 +5,9 @@ nlp = English()
 nlp.add_pipe(nlp.create_pipe('sentencizer'))
 
 class Sentence():
+    """
+    A single sentence. formatted from the sentence level of the elasticsearch index.
+    """
     def __init__(self, args, query_args, highlight_results, highlight=None):
         self.response_args = args
         self.sentence_args = args.get("_source")
@@ -78,6 +81,11 @@ class Sentence():
         return ' '.join(return_text)
 
 class TextSpan():
+    """
+    A single text span. formatted from the sentence level of the elasticsearch index.
+
+    Note text_span level is where the tags lie.
+    """
     def __init__(self, args):
         self.content = args.get("content")
         self.span = args.get("span")

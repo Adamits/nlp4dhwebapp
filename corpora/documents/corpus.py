@@ -183,7 +183,8 @@ class Corpus:
 
         Return: a list of sentences that match the criteria
         """
-        results = Query.generate(args)
+        query = Query(args)
+        results = query.generate()
         sentences = []
         highlights = []
         for corpus in results["hits"]["hits"]:
@@ -203,7 +204,8 @@ class Corpus:
         Return: a list of text_spans that match the criteria
         """
         text_spans = []
-        results = Query.generate(args)
+        query = Query(args)
+        results = query.generate()
 
         for corpus in results["hits"]["hits"]:
             text_spans += Corpus._get_text_spans_from_corpus_doc(corpus)
@@ -241,7 +243,8 @@ class Corpus:
 
         **Note that right now aggragations (e.g. agg_term) are ONLY by year
         """
-        results = Query.generate_aggregate_query(args)
+        query = Query(args)
+        results = query.generate_aggregate_query(aggregate_by=args.get("x_axis"))
         # Only aggregating by years...
         years = [y.strip() for y in args.get("years").split(",")]
         aggs_dict = {y: [] for y in years}
@@ -259,7 +262,7 @@ class Corpus:
         return aggs_dict
 
     @classmethod
-    def aggregate_sentences(c, args):
+    def aggregate_sentences(c, query, args):
         """
         Generates an ES query
 
@@ -267,7 +270,7 @@ class Corpus:
 
         **Note that right now aggragations (e.g. agg_term) are ONLY by year
         """
-        results = Query.generate_aggregate_query(args)
+        results = query.generate_aggregate_query(args)
         # Only aggregating by years...
         years = [y.strip() for y in args.get("years").split(",")]
         aggs_dict = {y: [] for y in years}
@@ -288,7 +291,6 @@ class Corpus:
         So we split on comma and entertain multiple queries, same with
         the dates
         """
-        is_aggregation = Query.is_aggregation_query(args)
         # Get a list of [{query: ..., etc}, {query: ..., etc}]
         # for all queries after splitting on ,
         queries, args_list = Corpus._split_args(args)
@@ -298,8 +300,9 @@ class Corpus:
         # Purely a content query, we only care about sentence level
         if not query_tags:
             for args in args_list:
-                if is_aggregation:
-                    sentences_dict = Corpus.aggregate_sentences(args)
+                query = Query(args)
+                if query.is_aggregation_query():
+                    sentences_dict = Corpus.aggregate_sentences(query, args)
                     count_dict = dict.fromkeys(sentences_dict.keys(), 0)
                     for k, sentences in sentences_dict.items():
                         # TODO this needs to count per ES term counts,
@@ -325,7 +328,8 @@ class Corpus:
 
         # Otherwise our query has some tags, so we look at the textSpan level
         for args in args_list:
-            if is_aggregation:
+            query = Query(args)
+            if query.is_aggregation_query():
                 text_spans_dict = Corpus.aggregate_text_spans(args)
                 count_dict = dict.fromkeys(text_spans_dict.keys(), 0)
                 for k, text_spans in text_spans_dict.items():

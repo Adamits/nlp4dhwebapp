@@ -1,3 +1,4 @@
+from ..query import Query
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
@@ -31,6 +32,40 @@ class Graph():
         self.data = data
         self.figure = None
         self.figure = self.figure if self.figure else self._make_figure()
+
+    @classmethod
+    def get_from_args(c, args, analysis):
+        g_type = args.get("chart_type", "bar")
+        labels = list(analysis.keys())
+        x_axis = args.get("x_axis")
+        y_axis = args.get("y_axis")
+        query = Query(args)
+        X = []
+
+        if x_axis == "years":
+            if query.is_aggregation_query():
+                years = args.get("years", [None])
+                years= [y.strip() for y in years.split(",")]
+                X = years
+                # Data should be [#keywords x #years]
+                data = [list(y.values()) for y in analysis.values()]
+            else:
+                # Even if no years, data should be a list of lists
+                data = [[v] for v in analysis.values()]
+        elif x_axis == "tags":
+            X = [s for s in args.get("srl")]
+            # Otherwise we have tags on the x axis
+            data = [[y] for y in analysis.values()]
+        else:
+            """
+            Otherwise we have no value on x-axis.
+            """
+            X = []
+            # Otherwise we have tags on the x axis
+            data = [[y] for y in analysis.values()]
+
+
+        return Graph(X, labels, data)
 
     def _make_figure(self):
         width = .1

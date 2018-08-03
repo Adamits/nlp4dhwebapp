@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 
+# Sets path to Adam's local dir, rather than docker structure
 DEV_MODE = True
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)

@@ -16,6 +16,11 @@ from django.http import JsonResponse
 import pickle
 
 def index(request):
+    """
+    Index page. Just lists the text document names (corpora, as we call them in the app)
+
+    Also displays whether a corpus is annotated (i.e. indexed in elasticsearch) or not.
+    """
     corpora_names = get_corpora_names()
     corpora = [Corpus(name) for name in corpora_names]
 
@@ -28,6 +33,10 @@ def index(request):
     )
 
 def get_corpus(request, name):
+    """
+    The show page for a single corpus. Will only work if the corpus is in the es index
+    i.e. is annotated.
+    """
     corpus = Corpus.get_by_name(name)
 
     if corpus is not None:
@@ -37,6 +46,10 @@ def get_corpus(request, name):
         return redirect('/corpora?')
 
 def edit_corpus(request, name):
+    """
+    The edit page for a corpus. POST request to this method
+    updates the corpus index with a new date.
+    """
     corpus = Corpus.get_by_name(name)
     form = CorpusForm()
 
@@ -55,6 +68,10 @@ def edit_corpus(request, name):
                                  "form": form})
 
 def annotate(request):
+    """
+    POST for corpora, to perform AllenNLP annotation from the NLP4DH
+    script, that postprocesses in JSON to be indexed in ES.
+    """
     names = request.POST.getlist('name')
     names = [name.rstrip('/') for name in names]
     a = Corpus.bulk_annotate(names)
@@ -62,6 +79,11 @@ def annotate(request):
     return redirect('/corpora?page=%s' % request.POST.get('page'))
 
 def delete(request):
+    """
+    deletes the given corpora from the es index.
+
+    does NOT delete the txt file in the shared data dir.
+    """
     names = request.POST.getlist('name')
     names = [name.rstrip('/') for name in names]
     Corpus.bulk_delete(names)
@@ -69,6 +91,9 @@ def delete(request):
     return redirect('/corpora?page=%s' % request.POST.get('page'))
 
 def concordance(request, q=None):
+    """
+    Page for finding and highlighting concordance.
+    """
     sentences = None
     num_sentences = None
 
@@ -89,6 +114,9 @@ def concordance(request, q=None):
                             "num_sentences": num_sentences})
 
 def analysis(request):
+    """
+    Page for performing analysis to be displayed in a graph.
+    """
     analysis = None
     graph_response = ""
     fig = None
@@ -97,22 +125,10 @@ def analysis(request):
     if request.method == 'POST':
         query_dict = request.POST
         form = AnalysisForm(query_dict)
-
         if form.is_valid():
-            graph_type = form.cleaned_data.get("chart_type", "bar")
-            graph_years = form.cleaned_data.get("years", [None])
-            graph_years= [y.strip() for y in graph_years.split(",")]
-
             analysis = Corpus.analyze(form.cleaned_data)
-            graph_labels = list(analysis.keys())
-            if Query.is_aggregation_query(form.cleaned_data):
-                # Data should be [#keywords x #years]
-                graph_data = [list(y.values()) for y in analysis.values()]
-            else:
-                # Even if no years, data should be a list of lists
-                graph_data = [[v] for v in analysis.values()]
-
-            graph = Graph(graph_years, graph_labels, graph_data)
+            print(analysis)
+            graph = Graph.get_from_args(form.cleaned_data, analysis)
 
             graph_response = graph.get_base64()
             request.session['graph'] = pickle.dumps(graph)
@@ -129,6 +145,11 @@ def analysis(request):
                         })
 
 def download_counts(request):
+    """
+    Should be called by AJAX, this method
+    makes the string of counts (or percentages, etc)
+    that will be downloaded in a txt file.
+    """
     analysis = None
     counts_file = CountsFile(args=None)
     if request.method == 'POST':
@@ -143,6 +164,11 @@ def download_counts(request):
     return JsonResponse({"counts": counts_file.str})#", ".join([e for e in form.errors])})
 
 def graph(request):
+    """
+    Should be called over AJAX.
+
+    This method is for downloading the graph as a file in the given format
+    """
     if request.method == 'POST':
         args_dict = request.POST
         form = GraphForm(args_dict)
