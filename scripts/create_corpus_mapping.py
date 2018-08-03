@@ -18,8 +18,8 @@ if __name__=='__main__':
     try:
       # JUST HERE WHILE WE ARE DEVELOPING AND MAKING CHANGES TO SCHEMA
       # THIS DELETES CURRENT SCHEMA, AKA ALL ANNOTATED DOCS
-      d = es.indices.delete(index='corpus', ignore=[404, 400])
-      print(d)
+      #d = es.indices.delete(index='corpus', ignore=[404, 400])
+      #print(d)
       r = es.indices.create(index='corpus', body=mapping)
       print(r)
       failed = False
